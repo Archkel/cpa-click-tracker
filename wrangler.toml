@@ -6,3 +6,7 @@ compatibility_date = "2026-10-06"
 binding = "CLICK_LOG"
 id = "90e302d1388b4c6b896ab6741eb9d5c4"
 workers_dev = true
+
+[[kv_namespaces]]
+binding = "OFFER_REGISTRY"
+id = "ff96481b21214c00ad5b5b7a25a5abeb"
