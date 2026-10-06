@@ -1,0 +1,7 @@
+name = "cpa-click-tracker"
+main = "src/index.js"
+compatibility_date = "2026-10-06"
+
+[[kv_namespaces]]
+binding = "CLICK_LOG"
+id = "90e302d1388b4c6b896ab6741eb9d5c4"
