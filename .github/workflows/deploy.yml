@@ -1,4 +1,4 @@
-name: Deploy CPA Click Tracker
+name: Deploy CPA Click Tracker v2
 
 on:
   push:
