@@ -13,17 +13,22 @@ export default {
         return Response.json({ error: "invalid_offer_id" }, { status: 400 });
       }
 
-      const offers = {
-        "5542950": {
-          tracking_url:
-            "https://www.cdnflyer.com/view.php?id=5542950&pub=3363954"
-        }
-      };
+      const rawOffer = await env.OFFER_REGISTRY.get(`offer:${offerId}`);
 
-      const offer = offers[offerId];
-
-      if (!offer) {
+      if (!rawOffer) {
         return Response.json({ error: "offer_not_found" }, { status: 404 });
+      }
+
+      let offer;
+
+      try {
+        offer = JSON.parse(rawOffer);
+      } catch {
+        return Response.json({ error: "offer_registry_invalid" }, { status: 500 });
+      }
+
+      if (offer.status !== "ready_for_human_approval") {
+        return Response.json({ error: "offer_not_active" }, { status: 404 });
       }
 
       const trackingUrl = offer.tracking_url;
