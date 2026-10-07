@@ -41,22 +41,8 @@ export default {
       }
 
       if (password !== expectedPassword) {
-        const encoder = new TextEncoder();
-        const hash = async (value) => {
-          const bytes = await crypto.subtle.digest("SHA-256", encoder.encode(value));
-          return Array.from(new Uint8Array(bytes)).map(b => b.toString(16).padStart(2, "0")).join("");
-        };
         return Response.json(
-          {
-            error: "unauthorized",
-            diagnostic: {
-              incoming_length: password.length,
-              configured_length: expectedPassword.length,
-              incoming_sha256: await hash(password),
-              configured_sha256: await hash(expectedPassword),
-              match: false
-            }
-          },
+          { error: "unauthorized" },
           { status: 401 }
         );
       }
