@@ -1,0 +1,23 @@
+name: TEMP KV Conversion Check
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check CLICK_LOG
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          npm install --no-save wrangler@4.148.0
+          echo "=== CONVERSION KEYS ==="
+          npx wrangler@4.148.0 kv key list --namespace-id=90e302d1388b4c6b896ab6741eb9d5c4 --remote | tee /tmp/keys.json
+          echo "=== CONVERSION RECORDS ==="
+          for key in $(grep -o '"name": *"conversion:[^"]*' /tmp/keys.json | sed 's/.*"conversion:/conversion:/;s/"$//'); do
+            echo "--- $key ---"
+            npx wrangler@4.148.0 kv key get "$key" --namespace-id=90e302d1388b4c6b896ab6741eb9d5c4 --remote
+          done
