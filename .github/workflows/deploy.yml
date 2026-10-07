@@ -1,4 +1,4 @@
-name: Deploy CPA Click Tracker v2
+name: Deploy CPA Click Tracker v3
 
 on:
   push:
@@ -13,7 +13,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install postback secret
+        env:
+          POSTBACK_PASSWORD: ${{ secrets.POSTBACK_PASSWORD }}
+        run: |
+          printf '%s' "$POSTBACK_PASSWORD" | npx wrangler@4.148.0 secret put POSTBACK_PASSWORD
+
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          wranglerVersion: "4.148.0"
