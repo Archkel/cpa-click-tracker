@@ -139,6 +139,30 @@ export default {
     }
 
     /*
+     * PROTECTED REVENUE SYNC
+     * Returns real conversion records from CLICK_LOG.
+     * Requires Authorization: Bearer REVENUE_SYNC_TOKEN.
+     */
+    if (url.pathname === "/admin/conversions") {
+      const auth = request.headers.get("Authorization") || "";
+      const expected = env.REVENUE_SYNC_TOKEN || "";
+      if (!expected || auth !== `Bearer ${expected}`) return Response.json({ error: "unauthorized" }, { status: 401 });
+      if (!env.CLICK_LOG) return Response.json({ error: "click_log_not_configured" }, { status: 503 });
+      const conversions = [];
+      let cursor;
+      do {
+        const page = await env.CLICK_LOG.list({ prefix: "conversion:", cursor, limit: 1000 });
+        for (const key of page.keys) {
+          const raw = await env.CLICK_LOG.get(key.name);
+          if (!raw) continue;
+          try { conversions.push(JSON.parse(raw)); } catch {}
+        }
+        cursor = page.list_complete ? undefined : page.cursor;
+      } while (cursor);
+      return Response.json({ status: "ok", count: conversions.length, conversions });
+    }
+
+    /*
      * EXISTING CLICK TRACKER
      *
      * Preserves:
