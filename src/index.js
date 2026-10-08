@@ -163,6 +163,75 @@ export default {
     }
 
     /*
+     * PROTECTED CLICK SYNC
+     * Returns click records from CLICK_LOG for revenue/performance sync.
+     * Requires Authorization: Bearer REVENUE_SYNC_TOKEN.
+     */
+    if (url.pathname === "/admin/clicks") {
+      const auth = request.headers.get("Authorization") || "";
+      const expected = env.REVENUE_SYNC_TOKEN || "";
+
+      if (!expected || auth !== `Bearer ${expected}`) {
+        return Response.json(
+          { error: "unauthorized" },
+          { status: 401 }
+        );
+      }
+
+      if (!env.CLICK_LOG) {
+        return Response.json(
+          { error: "click_log_not_configured" },
+          { status: 503 }
+        );
+      }
+
+      const clicks = [];
+      let cursor;
+
+      do {
+        const page = await env.CLICK_LOG.list({
+          cursor,
+          limit: 1000
+        });
+
+        for (const key of page.keys) {
+          if (key.name.startsWith("click:")) {
+            const raw = await env.CLICK_LOG.get(key.name);
+            if (!raw) continue;
+
+            try {
+              const record = JSON.parse(raw);
+              if (record?.type === "click") {
+                clicks.push(record);
+              }
+            } catch {}
+          }
+        }
+
+        cursor = page.list_complete ? undefined : page.cursor;
+      } while (cursor);
+
+      const byOffer = {};
+
+      for (const click of clicks) {
+        const offerId = String(click.offer_id ?? "unknown");
+
+        if (!byOffer[offerId]) {
+          byOffer[offerId] = 0;
+        }
+
+        byOffer[offerId]++;
+      }
+
+      return Response.json({
+        status: "ok",
+        count: clicks.length,
+        by_offer: byOffer,
+        clicks
+      });
+    }
+
+    /*
      * EXISTING CLICK TRACKER
      *
      * Preserves:
