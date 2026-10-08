@@ -24,7 +24,7 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           POSTBACK_PASSWORD: ${{ secrets.POSTBACK_PASSWORD }}
         run: |
-          printf '%s' "$POSTBACK_PASSWORD" | npx wrangler@4.148.0 secret put POSTBACK_PASSWORD --account-id ecdae0e9afe7bf7c7a52c9527791ae82
+          printf '%s' "$POSTBACK_PASSWORD" | npx wrangler@4.148.0 secret put POSTBACK_PASSWORD
 
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
