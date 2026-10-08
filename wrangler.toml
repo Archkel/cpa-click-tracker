@@ -1,4 +1,5 @@
 name = "cpa-click-tracker"
+account_id = "ecdae0e9afe7bf7c7a52c9527791ae82"
 main = "src/index.js"
 compatibility_date = "2026-10-06"
 
