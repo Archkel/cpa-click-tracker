@@ -19,6 +19,9 @@ jobs:
         run: |
           curl -sS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" https://api.cloudflare.com/client/v4/user/tokens/verify
 
+          echo "=== TESTING ACCOUNT ACCESS ==="
+          curl -sS -w "\nHTTP_STATUS=%{http_code}\n" -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "https://api.cloudflare.com/client/v4/accounts/${{ secrets.CLOUDFLARE_ACCOUNT_ID }}"
+
 
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
