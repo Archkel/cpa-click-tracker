@@ -110,6 +110,13 @@ export default {
         }
       }
 
+      if (!click || click.type !== "click" || !Number.isFinite(Number(click.offer_id))) {
+        return Response.json(
+          { error: "unmatched_click", message: "Conversion was not recorded because its subid could not be matched to a valid click." },
+          { status: 400 }
+        );
+      }
+
       const conversion = {
         type: "conversion",
         lead_id: leadId,
